@@ -1,0 +1,522 @@
+﻿@model GSTEducationERPLibrary.Accountant.Accountant
+
+@{
+    ViewBag.Title = "DetailsPurchaseAsyncVP";
+    Layout = "~/Views/Shared/_LayoutERP.cshtml";
+    var currency = Html.Raw(ViewBag.Currency);
+    var ListforFilter = ViewBag.ListForFilter;
+}
+
+
+
+<html lang="en" style="height: auto;">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- FontAwesome -->
+    <link href="~/Content/plugins/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Content/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <!-- Daterangepicker -->
+    <link href="~/Content/plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+    <!-- Toastr and SweetAlert -->
+    <link href="~/Content/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    <style>
+        #addpurchaseButton, #addvoucherButton {
+            margin-top: 15px !important;
+            font-size: 16px !important;
+        }
+
+        label {
+            padding-right: 5px;
+        }
+
+        .card-header {
+            cursor: pointer;
+        }
+
+        .btnicon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .green {
+            color: green;
+        }
+
+        .error-field {
+            border: 2px solid red; /* Add your preferred styling for highlighting */
+        }
+
+        a {
+            color: #33CCCC;
+        }
+
+        h2 {
+            padding-top: 10px;
+            margin-bottom: 10px;
+            font-family: Verdana;
+            font-weight: bold;
+            font-size: medium;
+            color: #33CCCC;
+        }
+
+        h3 {
+            padding-top: 10px;
+            margin-bottom: 10px;
+            font-family: Verdana;
+            text-align: center;
+            font-weight: bold;
+            font-size: medium;
+            color: #33CCCC;
+        }
+
+        .select2-container {
+            font-size: x-small;
+            width: 100%;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #33CCCC;
+        }
+
+        .select2 select2-container select2-container--default select2-container--focus {
+            width: 100% !important;
+        }
+        .destbl {
+            max-width: 400px;
+           width:200px;
+        }
+    </style>
+    <!--datatable css for the table-->
+    <style>
+        .dataTables_wrapper .btn-secondary {
+            color: #235;
+            background-color: transparent !important;
+            border-color: transparent;
+            font-size: x-large;
+            margin: 0px !important;
+        }
+
+        h2 {
+            padding-top: 10px;
+            margin-bottom: 10px;
+            font-family: Verdana;
+            font-weight: bold;
+            font-size: medium;
+            color: #33CCCC;
+        }
+
+        .card-primary.card-outline-tabs > .card-header a.active {
+            border-top: 3px solid #33CCCC;
+        }
+
+        a {
+            color: #33CCCC;
+        }
+
+        .card.card-outline-tabs .card-header a:hover {
+            color: #33CCCC;
+        }
+
+        .card-primary.card-outline-tabs > .card-header a.active, .card-primary.card-outline-tabs > .card-header a.active:hover {
+            border-top: 3px solid #33CCCC;
+        }
+
+        .card-body {
+            font-family: Calibri !important;
+            padding-bottom: 0px !important;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        th {
+            background-color: #33CCCC;
+            color: #000;
+            text-align: center !important;
+        }
+
+        td {
+            text-align: center;
+            color: black !important;
+        }
+
+        .table td {
+            padding: 0px 0px 0px 0px !important;
+            font-size: 14px !important;
+        }
+
+        .table th {
+            padding: 5px 5px 4px 10px !important;
+            font-size: 14px !important;
+        }
+
+        table.dataTable > thead .sorting:after, table.dataTable > thead .sorting:before {
+            font-size: xx-small !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter {
+            margin-top: -40px !important;
+        }
+
+        div.dt-buttons {
+            margin-top: -20px !important;
+        }
+
+        .btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn-group:not(:last-child) > .btn {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter label {
+            font-size: small !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter input {
+            height: 20px !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_info {
+            padding: 0px !important;
+            font-size: small !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            margin-top: -20px !important;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate {
+            font-size: small !important;
+        }
+
+        .container, .container-lg, .container-md, .container-sm, .container-xl {
+            max-width: none !important;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0;">
+    @using (Html.BeginForm("DetailsPurchaseAsyncVP", "Accountant"))
+    {
+        <br />
+        <div class="card">
+            <div class="card-body" style="padding-top:0px; ">
+                <div class="row">
+                    <div class="col-md-4 text-left mt-1" style="padding-left:20px;">
+                        <h2>Purchase Details</h2>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row g-6 justify-content-end">
+                            <div class="col-3">
+                                <button id="addvoucherButton" type="button" class="btn btn-block bg-gradient-info btn-block" onclick="location.href = '/Accountant/AddVoucherAsyncSGS'">
+                                    <i class="far fa-google-plus"></i>Add Voucher
+                                </button>
+                            </div>
+                            <div class="col-3">
+                                <button id="addpurchaseButton" type="button" class="btn btn-block bg-gradient-info btn-block" onclick="location.href = '/Accountant/AddPurchaseAsyncVP'">
+                                    <i class="fc-icon-plus-square"></i> Add Purchase
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+
+                <div class="col-md-2 form-group" style="width:fit-content;display:flex">
+                    <label style="padding-right: 10px; padding-left: 10px ">Status</label>
+                    <select id="statusFilter" class="form-control">
+                        <option value="selectall">Select All</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 form-group" style="width:fit-content;display:flex">
+                    <div class="input-group">
+                        <label for="startDate" class="label-control">Start Date</label>
+                        <div class="input-group-prepend ">
+                            <span class="input-group-text">
+                                <i class="far fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <input type="date" class="form-control col-md-6" id="startDateFilter" name="startDate">
+                    </div>
+                </div>
+                <div class="col-md-3 form-group" style="width:fit-content;display:flex">
+                    <div class="input-group">
+                        <label for="endDate">End Date   </label>
+                        <div class="input-group-prepend ">
+                            <span class="input-group-text">
+                                <i class="far fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <input type="date" class="form-control col-md-6" id="endDateFilter" name="endDate">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <span>
+                        <a href="javascript:void(0);" id="refreshIcon" class="icon">
+                            <video width="25" height="25" playsinline loop>
+                                <source src="~/Content/Admin/icon/Refresh.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div class="modal" id="StudentModal">
+                <div class="modal-dialog" style="background-color: white;">
+
+                    <div class="modal-content">
+                        <h1 class="text-info modal-title">Item List</h1>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="modal fade custom-modal-width" id="MatchVoucherModal" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width:30vw;">
+                        <div class="modal-body">
+                            <!-- Content for Schedule Modal -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="PurchaseList">
+
+            </div>
+
+
+        </div>
+
+
+
+
+    }
+    <div class="modal fade" id="BankModal" tabindex="-1" role="dialog" aria-labelledby="BankModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="BankModalLabel">Add Voucher</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="~/Content/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="~/Content/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Content/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <!-- DataTables Extensions -->
+    <script src="~/Content/plugins/jszip/jszip.min.js"></script>
+    <script src="~/Content/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/Content/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <!-- Moment and Daterangepicker -->
+    <script src="~/Content/plugins/moment/moment.min.js"></script>
+    <script src="~/Content/plugins/daterangepicker/daterangepicker.js"></script>
+    <!-- Toastr and SweetAlert -->
+    <script src="~/Content/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/Content/plugins/toastr/toastr.min.js"></script>
+    <!-- Custom Script -->
+    <script src="~/Content/Admin/js/Icon.js"></script>
+
+    <!-- Script for initializing jQuery and event handling -->
+    <script type="text/javascript">
+    jQuery.noConflict();
+    jQuery(document).ready(function ($) {
+        //Add purchase modal pop up view here
+        $('#addvoucherButton').on('click', function () {
+            $.ajax({
+                url: '@Url.Action("AddVoucherAsyncSGS", "Accountant")',
+                type: 'GET',
+                success: function (data) {
+                    $('#BankModal .modal-body').html(data);
+                    $('#BankModal').modal('show');
+                },
+                error: function () {
+                    Swal.fire('Error', 'Failed to load content', 'error');
+                }
+            });
+        });
+        // Handling click event for PopUpitem
+        $('#PurchaseList').on('click', '#PopUpitem', function () {
+            var PurchaseCode = $(this).data('id');
+            var url = $(this).data('url');
+            jQuery.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    jQuery('#StudentModal .modal-content').html(data);
+                    jQuery('#StudentModal').modal('show');
+                }
+            });
+        });
+
+        // Handling click event for Matchicon
+        $('#PurchaseList').on('click', '#Matchicon', function () {
+            var PurchaseCode = $(this).data('id');
+            var url = $(this).data('action');
+            jQuery.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    jQuery('#MatchVoucherModal .modal-content').html(data);
+                    jQuery('#MatchVoucherModal').modal('show');
+                }
+            });
+        });
+        $('#PurchaseList').on('click', '#ViewPurchase', function () {
+            debugger;
+            var purchaseCode = this.getAttribute('data-purchasecode');
+            window.location.href = '@Url.Action("ViewPurchaseAsyncVP", "Accountant")?purchaseCode=' + purchaseCode;
+        });
+
+
+        document.querySelectorAll('#EditPurchase').forEach(function(element) {
+            element.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var purchaseCode = this.getAttribute('data-purchasecode');
+                window.location.href = '@Url.Action("UpdatePurchaseAsyncVP", "Accountant")?PurchaseCode=' + purchaseCode;
+            });
+        });
+
+
+
+    });
+    </script>
+
+    <!-- Script for displaying Toastr notifications -->
+    <script>
+        function displayToast(message, type) {
+            toastr[type](message);
+        }
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            showMethod: 'slideDown',
+            timeOut: 4000 // How long the toast will be displayed (in milliseconds)
+        };
+    </script>
+    <!--filter here-->
+    <script type="text/javascript">
+    jQuery.noConflict();
+    jQuery(document).ready(function ($) {
+        function filterPurchases(status, startDate, endDate) {
+            var url = '@Url.Action("FilterPurchases", "Accountant")' +
+                '?status=' + encodeURIComponent(status) +
+                '&startDate=' + encodeURIComponent(startDate) +
+                '&endDate=' + encodeURIComponent(endDate);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    // Replace the content of the div with the new table
+                    $('#PurchaseList').html(response);
+
+                    // Reinitialize the DataTable
+                    var table = $('#PurchaseList table').DataTable({
+                        "responsive": true,
+                        "lengthChange": false,
+                        "autoWidth": false,
+                        "stateSave": true,
+                        "dom": 'Bfrtip',
+                        "buttons": [
+                            { extend: 'copy', text: '<img src="/Content/Admin/icon/copy.png" title="Copy" alt="Copy" height="20" width="20" />', titleAttr: 'Copy' },
+                            { extend: 'csv', text: '<img src="/Content/Admin/icon/csv.jpg" title="CSV" alt="CSV" height="20" width="20" />', titleAttr: 'CSV' },
+                            { extend: 'excel', text: '<img src="/Content/Admin/icon/xls-file.png" title="xls" alt="xls" height="20" width="20" />', titleAttr: 'Excel' },
+                            { extend: 'pdf', text: '<img src="/Content/Admin/icon/pdf-file.png" title="pdf" alt="pdf" height="20" width="20" />', titleAttr: 'PDF' },
+                            { extend: 'print', text: '<img src="/Content/Admin/icon/printer.png" title="printer" alt="printer" height="20" width="20" />', titleAttr: 'Print' },
+                            { extend: 'colvis', text: '<img src="/Content/Admin/icon/column.jpg" title="column" alt="column" height="20" width="20" />', titleAttr: 'Columns' }
+                        ]
+                    });
+
+                    // Move DataTable buttons to correct position
+                    table.buttons().container().appendTo('#PurchaseList .col-md-6:eq(0)');
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
+        }
+
+        function initializeFilterEventHandlers() {
+            var status = $('#statusFilter').val();
+            var startDate = $('#startDateFilter').val();
+            var endDate = $('#endDateFilter').val();
+
+            $('#statusFilter').off('change').on('change', function () {
+                status = $(this).val();
+                filterPurchases(status, startDate, endDate);
+            });
+
+            $('#startDateFilter').off('change').on('change', function () {
+                startDate = $(this).val();
+                filterPurchases(status, startDate, endDate);
+            });
+
+            $('#endDateFilter').off('change').on('change', function () {
+                endDate = $(this).val();
+                filterPurchases(status, startDate, endDate);
+            });
+        }
+
+        // Initial filter call if needed
+        var initialStatus = $('#statusFilter').val();
+        var initialStartDate = $('#startDateFilter').val();
+        var initialEndDate = $('#endDateFilter').val();
+
+        if (initialStatus || initialStartDate || initialEndDate) {
+            filterPurchases(initialStatus, initialStartDate, initialEndDate);
+        }
+
+        // Initialize filter event handlers
+        initializeFilterEventHandlers();
+        //refresh buuton
+        function refreshFilter() {
+            $('#statusFilter').val("selectall");
+            $('#startDateFilter').val(null);
+            $('#endDateFilter').val(null);
+             window.location.href = '@Url.Action("DetailsPurchaseAsyncVP", "Accountant")';
+        }
+        $('#refreshIcon').on('click', function () {
+            refreshFilter();
+        });
+    });
+    </script>
+
+
+</body>
+</html>
+
+
